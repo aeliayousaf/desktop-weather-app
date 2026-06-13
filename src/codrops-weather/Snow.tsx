@@ -14,8 +14,6 @@ interface SnowParticle {
   y: number;
   z: number;
   speed: number;
-  drift: number;
-  phase: number;
   kind: FlakeKind;
 }
 
@@ -53,10 +51,13 @@ function createFlakeTexture(kind: FlakeKind): THREE.CanvasTexture {
   return texture;
 }
 
-function pickFlakeKind(): FlakeKind {
+function pickFlakeKind(intensity: number): FlakeKind {
+  const t = Math.max(0, Math.min(100, intensity)) / 100;
+  const hazyChance = 0.12 + t * 0.38;
+  const softChance = 0.28 + t * 0.22;
   const roll = Math.random();
-  if (roll < 0.15) return "hazy";
-  if (roll < 0.42) return "soft";
+  if (roll < hazyChance) return "hazy";
+  if (roll < hazyChance + softChance) return "soft";
   return "sharp";
 }
 
@@ -73,9 +74,11 @@ export function Snow({ intensity = 50 }: SnowProps) {
   const hazyRef = useRef<THREE.Points>(null!);
 
   const particleCount = snowFlakeCount(intensity);
-  const fallMultiplier = scaleFloat(0.85, 1.65, intensity);
-  const sizeScale = scaleFloat(0.88, 1.35, intensity);
-  const opacityScale = scaleFloat(0.82, 1.08, intensity);
+  const fallMultiplier = scaleFloat(0.85, 2.6, intensity);
+  const sizeScale = scaleFloat(0.88, 1.45, intensity);
+  const opacityScale = scaleFloat(0.82, 1.18, intensity);
+  const spread = scaleFloat(20, 28, intensity);
+  const heightSpan = scaleFloat(20, 26, intensity);
 
   const textures = useMemo(
     () => ({
@@ -90,13 +93,11 @@ export function Snow({ intensity = 50 }: SnowProps) {
     const all: SnowParticle[] = [];
     for (let i = 0; i < particleCount; i++) {
       all.push({
-        x: (Math.random() - 0.5) * 20,
-        y: Math.random() * 20 + 10,
-        z: (Math.random() - 0.5) * 20,
+        x: (Math.random() - 0.5) * spread,
+        y: Math.random() * heightSpan + 10,
+        z: (Math.random() - 0.5) * spread,
         speed: (Math.random() * 0.02 + 0.01) * fallMultiplier,
-        drift: Math.random() * 0.02 - 0.01,
-        phase: Math.random() * Math.PI * 2,
-        kind: pickFlakeKind(),
+        kind: pickFlakeKind(intensity),
       });
     }
 
@@ -121,20 +122,18 @@ export function Snow({ intensity = 50 }: SnowProps) {
       soft: { flakes: soft, geometry: makeGeometry(soft) },
       hazy: { flakes: hazy, geometry: makeGeometry(hazy) },
     };
-  }, [particleCount, fallMultiplier]);
+  }, [particleCount, fallMultiplier, intensity, spread, heightSpan]);
 
-  useFrame((state, delta) => {
+  useFrame((_, delta) => {
     const dt = delta * 60;
-    const elapsed = state.clock.elapsedTime;
 
     const updateLayer = (flakes: SnowParticle[]) => {
       flakes.forEach((flake) => {
         flake.y -= flake.speed * dt;
-        flake.x += Math.sin(elapsed * 0.8 + flake.phase) * flake.drift * dt;
         if (flake.y < -1) {
-          flake.y = 20;
-          flake.x = (Math.random() - 0.5) * 20;
-          flake.z = (Math.random() - 0.5) * 20;
+          flake.y = heightSpan + 10;
+          flake.x = (Math.random() - 0.5) * spread;
+          flake.z = (Math.random() - 0.5) * spread;
         }
       });
     };
@@ -155,7 +154,11 @@ export function Snow({ intensity = 50 }: SnowProps) {
   return (
     <group>
       {layers.sharp.flakes.length > 0 && (
-        <points ref={sharpRef} geometry={layers.sharp.geometry}>
+        <points
+          key={`sharp-${layers.sharp.flakes.length}`}
+          ref={sharpRef}
+          geometry={layers.sharp.geometry}
+        >
           <pointsMaterial
             map={textures.sharp}
             transparent
@@ -169,7 +172,11 @@ export function Snow({ intensity = 50 }: SnowProps) {
         </points>
       )}
       {layers.soft.flakes.length > 0 && (
-        <points ref={softRef} geometry={layers.soft.geometry}>
+        <points
+          key={`soft-${layers.soft.flakes.length}`}
+          ref={softRef}
+          geometry={layers.soft.geometry}
+        >
           <pointsMaterial
             map={textures.soft}
             transparent
@@ -183,7 +190,11 @@ export function Snow({ intensity = 50 }: SnowProps) {
         </points>
       )}
       {layers.hazy.flakes.length > 0 && (
-        <points ref={hazyRef} geometry={layers.hazy.geometry}>
+        <points
+          key={`hazy-${layers.hazy.flakes.length}`}
+          ref={hazyRef}
+          geometry={layers.hazy.geometry}
+        >
           <pointsMaterial
             map={textures.hazy}
             transparent

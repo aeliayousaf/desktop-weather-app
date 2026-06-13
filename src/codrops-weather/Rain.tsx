@@ -90,7 +90,12 @@ export function Rain({ count = 800, intensity = 50, windBias = 0 }: RainProps) {
   });
 
   return (
-    <instancedMesh ref={meshRef} args={[planeGeo, undefined, particleCount]} frustumCulled={false}>
+    <instancedMesh
+      key={particleCount}
+      ref={meshRef}
+      args={[planeGeo, undefined, particleCount]}
+      frustumCulled={false}
+    >
       <meshBasicMaterial
         map={texture}
         transparent

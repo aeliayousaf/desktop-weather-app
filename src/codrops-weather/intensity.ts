@@ -14,6 +14,6 @@ export function scaleFloat(base: number, max: number, intensity: number): number
 
 export function snowFlakeCount(intensity: number): number {
   const t = clampIntensity(intensity) / 100;
-  const storm = t * t * (3 - 2 * t);
-  return Math.round(45 + storm * 820 + t * 95);
+  const blizzard = Math.pow(t, 1.75);
+  return Math.round(50 + blizzard * 3000 + t * 350);
 }

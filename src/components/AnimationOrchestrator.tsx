@@ -2,7 +2,10 @@ import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import type { WeatherAnimationType } from "../types/weather";
 import { useSettingsStore } from "../store/settingsStore";
-import { playWeatherSound } from "../utils/weatherSounds";
+import {
+  requestStopWeatherSound,
+  requestWeatherSound,
+} from "../utils/overlayBridge";
 
 const CodropsWeatherAnimation = lazy(() =>
   import("../codrops-weather/CodropsWeatherAnimation").then((module) => ({
@@ -39,8 +42,8 @@ export function AnimationOrchestrator({
     setCurrentType(activeType);
     setVisible(true);
 
-    if (soundEnabled) {
-      playWeatherSound(activeType);
+    if (soundEnabled && !forcePlay) {
+      void requestWeatherSound(activeType);
     }
 
     const fadeTimer = window.setTimeout(() => {
@@ -55,6 +58,9 @@ export function AnimationOrchestrator({
     return () => {
       window.clearTimeout(fadeTimer);
       window.clearTimeout(completeTimer);
+      if (soundEnabled) {
+        void requestStopWeatherSound();
+      }
     };
   }, [
     activeType,

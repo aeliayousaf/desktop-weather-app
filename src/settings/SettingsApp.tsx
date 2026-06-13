@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import {
   getSettingsSnapshot,
   useSettingsStore,
@@ -9,6 +10,7 @@ import {
   syncSettingsToOverlay,
   triggerOverlayTestAnimation,
 } from "../utils/overlayBridge";
+import { unlockWeatherAudio, playWeatherSound, stopWeatherSound } from "../utils/weatherSounds";
 import { ANIMATION_TYPES, type WeatherAnimationType } from "../types/weather";
 import "../styles/global.css";
 import "../styles/settings.css";
@@ -50,6 +52,37 @@ export function SettingsApp() {
     })();
   }, []);
 
+  useEffect(() => {
+    const unlockOnInteraction = () => {
+      void unlockWeatherAudio();
+    };
+
+    document.addEventListener("pointerdown", unlockOnInteraction, { once: true });
+    return () => document.removeEventListener("pointerdown", unlockOnInteraction);
+  }, []);
+
+  useEffect(() => {
+    const overlay = getCurrentWebviewWindow();
+
+    const unlistenPlay = overlay.listen<{ type: WeatherAnimationType }>(
+      "play-weather-sound",
+      (event) => {
+        const { soundEnabled } = useSettingsStore.getState();
+        if (!soundEnabled) return;
+        void playWeatherSound(event.payload.type);
+      },
+    );
+
+    const unlistenStop = overlay.listen("stop-weather-sound", () => {
+      stopWeatherSound();
+    });
+
+    return () => {
+      void unlistenPlay.then((fn) => fn());
+      void unlistenStop.then((fn) => fn());
+    };
+  }, []);
+
   const handleSaveCity = async () => {
     setLoading(true);
     setError(null);
@@ -69,7 +102,11 @@ export function SettingsApp() {
       );
 
       if (currentAnimation) {
-        await triggerOverlayTestAnimation(currentAnimation);
+        if (useSettingsStore.getState().soundEnabled) {
+          void unlockWeatherAudio();
+          void playWeatherSound(currentAnimation);
+        }
+        await triggerOverlayTestAnimation(currentAnimation, animationIntensity);
       }
 
       setSuccess(
@@ -85,7 +122,11 @@ export function SettingsApp() {
   };
 
   const handleTestAnimation = (type: WeatherAnimationType) => {
-    void triggerOverlayTestAnimation(type);
+    if (soundEnabled) {
+      void unlockWeatherAudio();
+      void playWeatherSound(type);
+    }
+    void triggerOverlayTestAnimation(type, animationIntensity);
   };
 
   return (
@@ -164,7 +205,14 @@ export function SettingsApp() {
             id="sound"
             type="checkbox"
             checked={soundEnabled}
-            onChange={(e) => updateSettings({ soundEnabled: e.target.checked })}
+            onChange={(e) => {
+              updateSettings({ soundEnabled: e.target.checked });
+              if (e.target.checked) {
+                void unlockWeatherAudio();
+              } else {
+                stopWeatherSound();
+              }
+            }}
           />
         </div>
       </section>

@@ -4,13 +4,9 @@ import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { fetchWeather } from "../services/weatherService";
 import { useSettingsStore, type Settings } from "../store/settingsStore";
 import { mapWeatherToAnimation } from "../utils/weatherCodeMapper";
+import type { TestAnimationEvent } from "../utils/overlayBridge";
 import type { WeatherAnimationType } from "../types/weather";
 import { POLL_INTERVAL_MS } from "../types/weather";
-
-interface TestAnimationEvent {
-  type: WeatherAnimationType;
-  id: number;
-}
 
 export function useWeatherWatcher() {
   const { latitude, longitude } = useSettingsStore();
@@ -80,6 +76,7 @@ export function useWeatherWatcher() {
     const unlistenTest = overlay.listen<TestAnimationEvent>(
       "trigger-test-animation",
       (event) => {
+        useSettingsStore.setState({ animationIntensity: event.payload.intensity });
         setTestAnimation(event.payload);
       },
     );

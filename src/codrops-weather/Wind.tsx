@@ -1,7 +1,6 @@
 import { useFrame } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
 import * as THREE from "three";
-import { Clouds } from "./Clouds";
 import { scaleCount, scaleFloat } from "./intensity";
 
 interface WindProps {
@@ -13,7 +12,6 @@ export function Wind({ intensity = 50 }: WindProps) {
   const dummy = useMemo(() => new THREE.Object3D(), []);
   const streakCount = scaleCount(30, 90, intensity);
   const speedMultiplier = scaleFloat(0.9, 1.8, intensity);
-  const cloudSpeed = scaleFloat(0.18, 0.42, intensity);
 
   const streaks = useMemo(() => {
     const temp = [];
@@ -52,11 +50,6 @@ export function Wind({ intensity = 50 }: WindProps) {
 
   return (
     <group>
-      <Clouds
-        intensity={scaleFloat(0.3, 0.55, intensity)}
-        speed={cloudSpeed}
-        compact
-      />
       <instancedMesh ref={meshRef} args={[undefined, undefined, streakCount]}>
         <boxGeometry args={[1, 1, 1]} />
         <meshBasicMaterial color="#D8E4F0" transparent opacity={0.35} />
