@@ -1,0 +1,103 @@
+.animation-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background: transparent;
+}
+
+.animation-canvas--glass {
+  filter: contrast(1.05) brightness(1.02);
+}
+
+.animation-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  background: transparent;
+}
+
+/* Sun — localized glow only, no sky wash */
+.sun-layer {
+  background: transparent;
+}
+
+.sun-halo {
+  position: absolute;
+  top: 4%;
+  right: 12%;
+  width: 14vmin;
+  height: 14vmin;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 245, 200, 0.45) 0%,
+    rgba(255, 220, 120, 0.15) 45%,
+    transparent 72%
+  );
+  animation: sun-pulse 4s ease-in-out infinite;
+}
+
+.sun-core {
+  position: absolute;
+  top: 8%;
+  right: 16%;
+  width: 6vmin;
+  height: 6vmin;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 240, 0.95) 0%,
+    rgba(255, 220, 100, 0.85) 55%,
+    transparent 100%
+  );
+  box-shadow: 0 0 24px rgba(255, 210, 100, 0.5);
+}
+
+@keyframes sun-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.06);
+    opacity: 1;
+  }
+}
+
+/* Codrops sun — localized upper sky, fade at bottom only */
+.codrops-weather-layer--sun {
+  mask-image: linear-gradient(to bottom, black 0%, black 52%, transparent 78%);
+}
+
+.codrops-weather-layer--sun canvas {
+  filter: contrast(1.04) saturate(1.08);
+}
+
+/* Codrops 3D weather — transparent fullscreen canvas */
+.codrops-weather-layer canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Clouds — volumetric ray-marched layer in upper band */
+.cloud-volumetric-layer {
+  mask-image: linear-gradient(to bottom, black 0%, black 48%, transparent 70%);
+}
+
+.cloud-volumetric-layer canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Lightning — Three.js bolts with localized glow, no fullscreen flash */
+.animation-canvas--lightning {
+  filter: contrast(1.12) brightness(1.14) saturate(1.05);
+}

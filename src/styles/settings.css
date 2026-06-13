@@ -1,0 +1,139 @@
+html,
+body,
+#root {
+  overflow-x: hidden;
+  overflow-y: auto;
+  background: #0f1117;
+  user-select: auto;
+}
+
+.settings-root {
+  min-height: 100%;
+  background: #0f1117;
+  color: #e8eaed;
+  padding: 24px;
+  padding-bottom: 32px;
+}
+
+.settings-header h1 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.settings-header p {
+  font-size: 0.85rem;
+  color: #9aa0a6;
+  margin-bottom: 24px;
+}
+
+.settings-section {
+  margin-bottom: 20px;
+}
+
+.settings-section h2 {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #9aa0a6;
+  margin-bottom: 10px;
+}
+
+.settings-field {
+  margin-bottom: 14px;
+}
+
+.settings-field label {
+  display: block;
+  font-size: 0.85rem;
+  margin-bottom: 6px;
+  color: #bdc1c6;
+}
+
+.settings-field input[type="text"],
+.settings-field input[type="number"] {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #2d3139;
+  background: #1a1d24;
+  color: #e8eaed;
+  font-size: 0.9rem;
+}
+
+.settings-field input[type="range"] {
+  width: 100%;
+  accent-color: #5b9cf5;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+}
+
+.settings-row label {
+  font-size: 0.9rem;
+}
+
+.settings-row input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #5b9cf5;
+}
+
+.settings-btn {
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.settings-btn-primary {
+  background: #5b9cf5;
+  color: #0f1117;
+  width: 100%;
+}
+
+.settings-btn-primary:hover {
+  background: #7ab0f7;
+}
+
+.settings-btn-secondary {
+  background: #1a1d24;
+  color: #e8eaed;
+  border: 1px solid #2d3139;
+}
+
+.settings-btn-secondary:hover {
+  background: #252830;
+}
+
+.test-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.settings-error {
+  margin-top: 8px;
+  font-size: 0.85rem;
+  color: #f28b82;
+}
+
+.settings-success {
+  margin-top: 8px;
+  font-size: 0.85rem;
+  color: #81c995;
+}
+
+.settings-location {
+  font-size: 0.8rem;
+  color: #9aa0a6;
+  margin-top: 6px;
+}
