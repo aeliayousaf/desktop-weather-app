@@ -1,9 +1,14 @@
 use tauri::{
+    image::Image,
+    include_image,
     menu::{CheckMenuItem, Menu, MenuItem},
     tray::TrayIconBuilder,
     window::{Color, Effect, EffectsBuilder},
     Emitter, Manager,
 };
+
+const TRAY_ICON: Image<'static> = include_image!("icons/tray-32.png");
+const WINDOW_ICON: Image<'static> = include_image!("icons/128x128.png");
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -26,7 +31,7 @@ pub fn run() {
             let app_handle = app.handle().clone();
 
             let _tray = TrayIconBuilder::new()
-                .icon(app.default_window_icon().unwrap().clone())
+                .icon(TRAY_ICON.clone())
                 .menu(&menu)
                 .on_menu_event(move |app, event| match event.id.as_ref() {
                     "settings" => {
@@ -71,6 +76,7 @@ pub fn run() {
             }
 
             if let Some(settings) = app.get_webview_window("settings") {
+                let _ = settings.set_icon(WINDOW_ICON.clone());
                 let _ = settings.set_background_color(Some(Color(0, 0, 0, 0)));
                 let _ = settings.set_effects(
                     EffectsBuilder::new()
@@ -78,6 +84,9 @@ pub fn run() {
                         .color(Color(255, 255, 255, 40))
                         .build(),
                 );
+                let _ = settings.show();
+                let _ = settings.set_always_on_top(true);
+                let _ = settings.set_focus();
 
                 let app_handle = app.handle().clone();
                 settings.on_window_event(move |event| {

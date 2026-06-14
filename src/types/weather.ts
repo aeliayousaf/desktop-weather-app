@@ -40,7 +40,25 @@ export interface WeatherData {
   };
 }
 
-export const POLL_INTERVAL_MS = 5 * 60 * 1000;
+/** Weather data plus when this app last fetched it successfully. */
+export interface WeatherSnapshot extends WeatherData {
+  fetchedAt: string;
+}
+
+export function formatUpdatedAt(fetchedAt: string): string {
+  const date = new Date(fetchedAt);
+  const ageMs = Date.now() - date.getTime();
+
+  if (ageMs < 60_000) {
+    return "just now";
+  }
+
+  const pad = (value: number) => String(value).padStart(2, "0");
+
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
+export const POLL_INTERVAL_MS = 2 * 60 * 1000;
 
 export const ANIMATION_TYPES: WeatherAnimationType[] = [
   "sun",

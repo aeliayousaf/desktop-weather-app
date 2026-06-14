@@ -5,6 +5,7 @@ import { fetchWeather } from "../services/weatherService";
 import { useSettingsStore, type Settings } from "../store/settingsStore";
 import { mapWeatherToAnimation } from "../utils/weatherCodeMapper";
 import type { TestAnimationEvent } from "../utils/overlayBridge";
+import { emitWeatherUpdate } from "../utils/overlayBridge";
 import type { WeatherAnimationType } from "../types/weather";
 import { POLL_INTERVAL_MS } from "../types/weather";
 
@@ -28,6 +29,12 @@ export function useWeatherWatcher() {
 
     try {
       const weather = await fetchWeather(lat, lon);
+      const snapshot = {
+        ...weather,
+        fetchedAt: new Date().toISOString(),
+      };
+      void emitWeatherUpdate(snapshot);
+
       const condition = mapWeatherToAnimation(
         weather.weatherCode,
         weather.windSpeedKmh,

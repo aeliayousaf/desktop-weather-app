@@ -181,7 +181,10 @@ export function SettingsApp() {
       setCity(locationLabel);
 
       const weather = await fetchWeather(result.latitude, result.longitude);
-      setWeather(weather);
+      setWeather({
+        ...weather,
+        fetchedAt: new Date().toISOString(),
+      });
       const currentAnimation = mapWeatherToAnimation(
         weather.weatherCode,
         weather.windSpeedKmh,
@@ -220,11 +223,22 @@ export function SettingsApp() {
     <LiquidGlassProvider>
       <div className="settings-root">
         <header className="settings-header">
-          <h1>Weather Overlay</h1>
-          <p>
-            Animations play when weather changes. Use test buttons below for an
-            instant preview.
-          </p>
+          <div className="settings-header-brand">
+            <img
+              className="settings-app-icon"
+              src="/app-logo.png"
+              alt=""
+              width={88}
+              height={88}
+            />
+            <div>
+              <h1>Weather Overlay</h1>
+              <p>
+                Animations play when weather changes. Use test buttons below for an
+                instant preview.
+              </p>
+            </div>
+          </div>
         </header>
 
         {(city || weather) && (

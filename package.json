@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "tauri": "tauri",
     "tauri:dev": "dev-msvc.bat",
-    "icons": "tauri icon app-icon.png",
+    "icons": "node scripts/prepare-app-icon.mjs && tauri icon app-icon.png && node scripts/sync-public-icons.mjs",
     "reinstall": "npm run tauri build && reinstall.bat",
     "update-app": "update-installed-app.bat"
   },
@@ -32,6 +32,7 @@
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "@vitejs/plugin-react": "^4.6.0",
+    "sharp": "^0.34.5",
     "typescript": "~5.8.3",
     "vite": "^7.0.4"
   }

@@ -1,5 +1,5 @@
 import { emitTo } from "@tauri-apps/api/event";
-import type { WeatherAnimationType } from "../types/weather";
+import type { WeatherAnimationType, WeatherSnapshot } from "../types/weather";
 import type { Settings } from "../store/settingsStore";
 
 export const OVERLAY_WINDOW_LABEL = "overlay";
@@ -29,4 +29,8 @@ export function requestWeatherSound(type: WeatherAnimationType) {
 
 export function requestStopWeatherSound() {
   return emitTo(SETTINGS_WINDOW_LABEL, "stop-weather-sound", null);
+}
+
+export function emitWeatherUpdate(weather: WeatherSnapshot) {
+  return emitTo(SETTINGS_WINDOW_LABEL, "weather-updated", weather);
 }

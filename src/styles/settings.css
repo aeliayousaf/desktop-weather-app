@@ -26,6 +26,20 @@ body {
   padding: 4px 6px 12px;
 }
 
+.settings-header-brand {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.settings-app-icon {
+  flex-shrink: 0;
+  width: 88px;
+  height: 88px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.35));
+}
+
 .settings-header h1 {
   font-size: 1.45rem;
   font-weight: 700;

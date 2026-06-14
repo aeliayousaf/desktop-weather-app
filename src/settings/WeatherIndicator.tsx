@@ -1,13 +1,15 @@
-import type { WeatherData } from "../types/weather";
+import { useEffect, useState } from "react";
+import type { WeatherSnapshot } from "../types/weather";
 import {
   formatTemperature,
+  formatUpdatedAt,
   temperatureUnitLabel,
   type TemperatureUnit,
 } from "../types/weather";
 
 interface WeatherIndicatorProps {
   city: string;
-  weather: WeatherData | null;
+  weather: WeatherSnapshot | null;
   loading: boolean;
   error: string | null;
   temperatureUnit: TemperatureUnit;
@@ -20,6 +22,16 @@ export function WeatherIndicator({
   error,
   temperatureUnit,
 }: WeatherIndicatorProps) {
+  const [, setTick] = useState(0);
+
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      setTick((value) => value + 1);
+    }, 30_000);
+
+    return () => window.clearInterval(interval);
+  }, []);
+
   if (!city && !weather) {
     return null;
   }
@@ -53,7 +65,7 @@ export function WeatherIndicator({
               {city && <p className="weather-indicator-location">{city}</p>}
               <p className="weather-indicator-meta">
                 Wind {Math.round(weather.windSpeedKmh)} km/h
-                {weather.lastUpdated ? ` · Updated ${weather.lastUpdated}` : ""}
+                {weather.fetchedAt ? ` · Updated ${formatUpdatedAt(weather.fetchedAt)}` : ""}
               </p>
             </div>
           </div>
