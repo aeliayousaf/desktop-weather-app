@@ -4,9 +4,11 @@ import type { Settings } from "../store/settingsStore";
 
 export const OVERLAY_WINDOW_LABEL = "overlay";
 export const SETTINGS_WINDOW_LABEL = "settings";
+export const WIDGET_WINDOW_LABEL = "widget";
 
 export function syncSettingsToOverlay(settings: Settings) {
-  return emitTo(OVERLAY_WINDOW_LABEL, "settings-sync", settings);
+  void emitTo(OVERLAY_WINDOW_LABEL, "settings-sync", settings);
+  void emitTo(WIDGET_WINDOW_LABEL, "settings-sync", settings);
 }
 
 export interface TestAnimationEvent {
@@ -32,5 +34,6 @@ export function requestStopWeatherSound() {
 }
 
 export function emitWeatherUpdate(weather: WeatherSnapshot) {
-  return emitTo(SETTINGS_WINDOW_LABEL, "weather-updated", weather);
+  void emitTo(SETTINGS_WINDOW_LABEL, "weather-updated", weather);
+  void emitTo(WIDGET_WINDOW_LABEL, "weather-updated", weather);
 }

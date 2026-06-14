@@ -38,11 +38,25 @@
         "decorations": true,
         "resizable": true,
         "transparent": true,
+        "shadow": false
+      },
+      {
+        "label": "widget",
+        "title": "Weather",
+        "url": "widget.html",
+        "width": 400,
+        "height": 228,
+        "minWidth": 320,
+        "minHeight": 140,
+        "visible": false,
+        "center": false,
+        "decorations": false,
+        "resizable": false,
+        "transparent": true,
+        "alwaysOnTop": true,
+        "skipTaskbar": true,
         "shadow": false,
-        "windowEffects": {
-          "effects": ["acrylic"],
-          "color": [255, 255, 255, 40]
-        }
+        "focus": false
       }
     ],
     "security": {

@@ -1,0 +1,8 @@
+[[permission]]
+identifier = "allow-minimal-mode"
+description = "Allows minimal widget and settings window visibility commands"
+commands.allow = [
+  "set_minimal_mode",
+  "open_settings_window",
+  "show_settings_on_startup",
+]

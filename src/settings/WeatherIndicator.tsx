@@ -13,6 +13,7 @@ interface WeatherIndicatorProps {
   loading: boolean;
   error: string | null;
   temperatureUnit: TemperatureUnit;
+  compact?: boolean;
 }
 
 export function WeatherIndicator({
@@ -21,6 +22,7 @@ export function WeatherIndicator({
   loading,
   error,
   temperatureUnit,
+  compact = false,
 }: WeatherIndicatorProps) {
   const [, setTick] = useState(0);
 
@@ -39,7 +41,7 @@ export function WeatherIndicator({
   const unitLabel = temperatureUnitLabel(temperatureUnit);
 
   return (
-    <div className="weather-indicator">
+    <div className={`weather-indicator${compact ? " weather-indicator-compact" : ""}`}>
       {loading && !weather ? (
         <p className="weather-indicator-loading">Loading current weather…</p>
       ) : error && !weather ? (

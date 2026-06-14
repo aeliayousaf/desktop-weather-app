@@ -26,6 +26,7 @@ export default defineConfig(async () => ({
       input: {
         overlay: "overlay.html",
         settings: "settings.html",
+        widget: "widget.html",
       },
     },
   },

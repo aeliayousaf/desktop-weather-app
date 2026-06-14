@@ -13,6 +13,7 @@ export interface Settings {
   soundEnabled: boolean;
   windThresholdKmh: number;
   temperatureUnit: TemperatureUnit;
+  minimalMode: boolean;
   paused: boolean;
   enabledAnimations: Record<WeatherAnimationType, boolean>;
 }
@@ -43,6 +44,7 @@ export function getSettingsSnapshot(state: SettingsState): Settings {
     soundEnabled: state.soundEnabled,
     windThresholdKmh: state.windThresholdKmh,
     temperatureUnit: state.temperatureUnit,
+    minimalMode: state.minimalMode,
     paused: state.paused,
     enabledAnimations: state.enabledAnimations,
   };
@@ -63,6 +65,7 @@ export const useSettingsStore = create<SettingsState>()(
       soundEnabled: false,
       windThresholdKmh: 35,
       temperatureUnit: "celsius" as TemperatureUnit,
+      minimalMode: false,
       paused: false,
       enabledAnimations: defaultEnabledAnimations,
 

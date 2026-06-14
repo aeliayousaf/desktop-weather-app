@@ -11,7 +11,9 @@ import {
   triggerOverlayTestAnimation,
 } from "../utils/overlayBridge";
 import { unlockWeatherAudio, playWeatherSound, stopWeatherSound } from "../utils/weatherSounds";
-import { ANIMATION_TYPES, type TemperatureUnit, type WeatherAnimationType } from "../types/weather";
+import { applyMinimalMode, showSettingsOnStartup } from "../utils/minimalMode";
+import { ANIMATION_TYPES, type WeatherAnimationType } from "../types/weather";
+import { TemperatureUnitToggle } from "../components/TemperatureUnitToggle";
 import { LiquidGlassCard, LiquidGlassProvider } from "./LiquidGlassCard";
 import { useCurrentWeather } from "./useCurrentWeather";
 import { WeatherIndicator } from "./WeatherIndicator";
@@ -65,38 +67,6 @@ function SettingsToggle({
   );
 }
 
-function TemperatureUnitToggle({
-  unit,
-  onChange,
-}: {
-  unit: TemperatureUnit;
-  onChange: (unit: TemperatureUnit) => void;
-}) {
-  return (
-    <div className="settings-row">
-      <span className="settings-row-label">Temperature</span>
-      <div className="temp-unit-toggle" role="group" aria-label="Temperature unit">
-        <button
-          type="button"
-          className={unit === "celsius" ? "active" : ""}
-          aria-pressed={unit === "celsius"}
-          onClick={() => onChange("celsius")}
-        >
-          °C
-        </button>
-        <button
-          type="button"
-          className={unit === "fahrenheit" ? "active" : ""}
-          aria-pressed={unit === "fahrenheit"}
-          onClick={() => onChange("fahrenheit")}
-        >
-          °F
-        </button>
-      </div>
-    </div>
-  );
-}
-
 export function SettingsApp() {
   const {
     city,
@@ -107,6 +77,7 @@ export function SettingsApp() {
     soundEnabled,
     windThresholdKmh,
     temperatureUnit,
+    minimalMode,
     enabledAnimations,
     setCity,
     setLocation,
@@ -124,7 +95,12 @@ export function SettingsApp() {
   useEffect(() => {
     void (async () => {
       await useSettingsStore.persist.rehydrate();
-      await syncSettingsToOverlay(getSettingsSnapshot(useSettingsStore.getState()));
+      const state = useSettingsStore.getState();
+      await syncSettingsToOverlay(getSettingsSnapshot(state));
+      await applyMinimalMode(state.minimalMode);
+      if (!state.minimalMode) {
+        await showSettingsOnStartup();
+      }
     })();
   }, []);
 
@@ -240,6 +216,23 @@ export function SettingsApp() {
             </div>
           </div>
         </header>
+
+        <LiquidGlassCard>
+          <h2 className="settings-section-title">Display</h2>
+          <SettingsToggle
+            id="minimal-mode"
+            label="Minimal desktop widget"
+            checked={minimalMode}
+            onChange={(checked) => {
+              updateSettings({ minimalMode: checked });
+              void applyMinimalMode(checked);
+            }}
+          />
+          <p className="settings-hint">
+            Shows only the current weather card on your desktop. Open full settings from
+            the tray or the widget gear icon.
+          </p>
+        </LiquidGlassCard>
 
         {(city || weather) && (
           <LiquidGlassCard>

@@ -1,18 +1,52 @@
+mod commands;
+
+use commands::{open_settings_window, set_minimal_mode, show_settings_on_startup};
 use tauri::{
     image::Image,
     include_image,
     menu::{CheckMenuItem, Menu, MenuItem},
     tray::TrayIconBuilder,
     window::{Color, Effect, EffectsBuilder},
-    Emitter, Manager,
+    Emitter, Manager, PhysicalPosition,
 };
 
 const TRAY_ICON: Image<'static> = include_image!("icons/tray-32.png");
 const WINDOW_ICON: Image<'static> = include_image!("icons/128x128.png");
+const WIDGET_WIDTH: i32 = 400;
+const WIDGET_MARGIN: i32 = 24;
+
+fn prepare_widget_window(window: &tauri::WebviewWindow) {
+    let _ = window.set_background_color(Some(Color(0, 0, 0, 0)));
+    let _ = window.set_effects(None::<tauri::utils::config::WindowEffectsConfig>);
+}
+
+fn apply_settings_effects(window: &tauri::WebviewWindow) {
+    let _ = window.set_background_color(Some(Color(0, 0, 0, 0)));
+    let _ = window.set_effects(
+        EffectsBuilder::new()
+            .effect(Effect::Acrylic)
+            .color(Color(255, 255, 255, 40))
+            .build(),
+    );
+}
+
+fn position_widget(window: &tauri::WebviewWindow) {
+    if let Ok(Some(monitor)) = window.current_monitor() {
+        let work = monitor.work_area();
+        let x = work.position.x + work.size.width as i32 - WIDGET_WIDTH - WIDGET_MARGIN;
+        let y = work.position.y + WIDGET_MARGIN;
+        let _ = window.set_position(PhysicalPosition::new(x, y));
+    }
+}
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .invoke_handler(tauri::generate_handler![
+            set_minimal_mode,
+            open_settings_window,
+            show_settings_on_startup,
+        ])
         .setup(|app| {
             let settings_item =
                 MenuItem::with_id(app, "settings", "Settings", true, None::<&str>)?;
@@ -35,18 +69,7 @@ pub fn run() {
                 .menu(&menu)
                 .on_menu_event(move |app, event| match event.id.as_ref() {
                     "settings" => {
-                        if let Some(window) = app.get_webview_window("settings") {
-                            let _ = window.unminimize();
-                            let _ = window.set_effects(
-                                EffectsBuilder::new()
-                                    .effect(Effect::Acrylic)
-                                    .color(Color(255, 255, 255, 40))
-                                    .build(),
-                            );
-                            let _ = window.show();
-                            let _ = window.set_always_on_top(true);
-                            let _ = window.set_focus();
-                        }
+                        let _ = open_settings_window(app.clone());
                     }
                     "pause" => {
                         let new_checked = !pause_item_clone.is_checked().unwrap_or(false);
@@ -77,16 +100,7 @@ pub fn run() {
 
             if let Some(settings) = app.get_webview_window("settings") {
                 let _ = settings.set_icon(WINDOW_ICON.clone());
-                let _ = settings.set_background_color(Some(Color(0, 0, 0, 0)));
-                let _ = settings.set_effects(
-                    EffectsBuilder::new()
-                        .effect(Effect::Acrylic)
-                        .color(Color(255, 255, 255, 40))
-                        .build(),
-                );
-                let _ = settings.show();
-                let _ = settings.set_always_on_top(true);
-                let _ = settings.set_focus();
+                apply_settings_effects(&settings);
 
                 let app_handle = app.handle().clone();
                 settings.on_window_event(move |event| {
@@ -103,6 +117,12 @@ pub fn run() {
                         }
                     }
                 });
+            }
+
+            if let Some(widget) = app.get_webview_window("widget") {
+                prepare_widget_window(&widget);
+                position_widget(&widget);
+                let _ = widget.set_always_on_top(true);
             }
 
             Ok(())

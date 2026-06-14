@@ -1,0 +1,119 @@
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+body {
+  font-family:
+    -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.widget-root {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  background: transparent;
+  user-select: none;
+}
+
+.widget-card.liquid-glass-card {
+  margin: 0;
+  height: 100%;
+  border-radius: 22px;
+  box-shadow:
+    0 10px 28px rgba(0, 0, 0, 0.3),
+    0 2px 6px rgba(0, 0, 0, 0.18);
+}
+
+.widget-card .liquid-glass-card-content {
+  padding: 14px 16px 16px;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.widget-drag-region {
+  -webkit-app-region: drag;
+  cursor: grab;
+}
+
+.widget-drag-region:active {
+  cursor: grabbing;
+}
+
+.widget-no-drag {
+  -webkit-app-region: no-drag;
+}
+
+.widget-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.widget-header .settings-section-title {
+  margin-bottom: 0;
+  flex: 1;
+}
+
+.widget-settings-btn {
+  flex-shrink: 0;
+  border: none;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.85);
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.widget-settings-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.widget-card .weather-indicator-main {
+  gap: 12px;
+}
+
+.widget-card .weather-indicator-condition {
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.45);
+}
+
+.widget-card .weather-indicator-temp {
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.45);
+}
+
+.widget-card .settings-row {
+  margin-top: 12px;
+  margin-bottom: 0;
+}
+
+.widget-empty {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.72);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
+}
+
+.widget-empty button {
+  border: none;
+  background: none;
+  color: rgba(255, 255, 255, 0.95);
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+  font: inherit;
+}
