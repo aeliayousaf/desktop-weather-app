@@ -8,7 +8,10 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "tauri": "tauri",
-    "tauri:dev": "dev-msvc.bat"
+    "tauri:dev": "dev-msvc.bat",
+    "icons": "tauri icon app-icon.png",
+    "reinstall": "npm run tauri build && reinstall.bat",
+    "update-app": "update-installed-app.bat"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",

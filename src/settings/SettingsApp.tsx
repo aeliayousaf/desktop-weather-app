@@ -11,8 +11,10 @@ import {
   triggerOverlayTestAnimation,
 } from "../utils/overlayBridge";
 import { unlockWeatherAudio, playWeatherSound, stopWeatherSound } from "../utils/weatherSounds";
-import { ANIMATION_TYPES, type WeatherAnimationType } from "../types/weather";
+import { ANIMATION_TYPES, type TemperatureUnit, type WeatherAnimationType } from "../types/weather";
 import { LiquidGlassCard, LiquidGlassProvider } from "./LiquidGlassCard";
+import { useCurrentWeather } from "./useCurrentWeather";
+import { WeatherIndicator } from "./WeatherIndicator";
 import "../styles/settings.css";
 import "./liquidGlass.css";
 
@@ -63,6 +65,38 @@ function SettingsToggle({
   );
 }
 
+function TemperatureUnitToggle({
+  unit,
+  onChange,
+}: {
+  unit: TemperatureUnit;
+  onChange: (unit: TemperatureUnit) => void;
+}) {
+  return (
+    <div className="settings-row">
+      <span className="settings-row-label">Temperature</span>
+      <div className="temp-unit-toggle" role="group" aria-label="Temperature unit">
+        <button
+          type="button"
+          className={unit === "celsius" ? "active" : ""}
+          aria-pressed={unit === "celsius"}
+          onClick={() => onChange("celsius")}
+        >
+          °C
+        </button>
+        <button
+          type="button"
+          className={unit === "fahrenheit" ? "active" : ""}
+          aria-pressed={unit === "fahrenheit"}
+          onClick={() => onChange("fahrenheit")}
+        >
+          °F
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export function SettingsApp() {
   const {
     city,
@@ -72,6 +106,7 @@ export function SettingsApp() {
     animationIntensity,
     soundEnabled,
     windThresholdKmh,
+    temperatureUnit,
     enabledAnimations,
     setCity,
     setLocation,
@@ -83,6 +118,8 @@ export function SettingsApp() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const { weather, loading: weatherLoading, error: weatherError, setWeather } =
+    useCurrentWeather(latitude, longitude);
 
   useEffect(() => {
     void (async () => {
@@ -90,6 +127,16 @@ export function SettingsApp() {
       await syncSettingsToOverlay(getSettingsSnapshot(useSettingsStore.getState()));
     })();
   }, []);
+
+  useEffect(() => {
+    if (!success) return;
+
+    const timer = window.setTimeout(() => {
+      setSuccess(null);
+    }, 4000);
+
+    return () => window.clearTimeout(timer);
+  }, [success]);
 
   useEffect(() => {
     const unlockOnInteraction = () => {
@@ -134,6 +181,7 @@ export function SettingsApp() {
       setCity(locationLabel);
 
       const weather = await fetchWeather(result.latitude, result.longitude);
+      setWeather(weather);
       const currentAnimation = mapWeatherToAnimation(
         weather.weatherCode,
         weather.windSpeedKmh,
@@ -178,6 +226,23 @@ export function SettingsApp() {
             instant preview.
           </p>
         </header>
+
+        {(city || weather) && (
+          <LiquidGlassCard>
+            <h2 className="settings-section-title">Current Weather</h2>
+            <WeatherIndicator
+              city={city}
+              weather={weather}
+              loading={weatherLoading}
+              error={weatherError}
+              temperatureUnit={temperatureUnit}
+            />
+            <TemperatureUnitToggle
+              unit={temperatureUnit}
+              onChange={(unit) => updateSettings({ temperatureUnit: unit })}
+            />
+          </LiquidGlassCard>
+        )}
 
         <LiquidGlassCard>
           <h2 className="settings-section-title">Location</h2>

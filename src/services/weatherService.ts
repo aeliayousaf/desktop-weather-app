@@ -1,25 +1,78 @@
 import type { GeoResult, WeatherData } from "../types/weather";
 
-interface GeocodingResponse {
-  results?: Array<{
-    name: string;
-    country: string;
-    latitude: number;
-    longitude: number;
-  }>;
+const WEATHER_API_BASE = "https://api.weatherapi.com/v1";
+
+interface WeatherApiError {
+  error?: {
+    code?: number;
+    message?: string;
+  };
 }
 
-interface ForecastResponse {
-  current: {
-    weather_code: number;
-    wind_speed_10m: number;
-    temperature_2m: number;
+interface SearchLocation {
+  id: number;
+  name: string;
+  region: string;
+  country: string;
+  lat: number;
+  lon: number;
+}
+
+interface ForecastResponse extends WeatherApiError {
+  location?: {
+    name: string;
+    region: string;
+    country: string;
+    lat: number;
+    lon: number;
   };
-  hourly: {
-    time: string[];
-    weather_code: number[];
-    wind_speed_10m: number[];
+  current?: {
+    last_updated: string;
+    temp_c: number;
+    wind_kph: number;
+    condition: {
+      code: number;
+      text: string;
+      icon: string;
+    };
   };
+  forecast?: {
+    forecastday: Array<{
+      hour: Array<{
+        time: string;
+        wind_kph: number;
+        condition: {
+          code: number;
+        };
+      }>;
+    }>;
+  };
+}
+
+function getApiKey(): string {
+  const key = import.meta.env.VITE_WEATHERAPI_KEY?.trim();
+  if (!key) {
+    throw new Error(
+      "WeatherAPI key is missing. Add VITE_WEATHERAPI_KEY to a .env file in the project root.",
+    );
+  }
+  return key;
+}
+
+async function parseWeatherApiResponse<T>(response: Response): Promise<T> {
+  const data = (await response.json()) as T & WeatherApiError;
+
+  if (!response.ok || data.error) {
+    throw new Error(
+      data.error?.message ?? `WeatherAPI request failed (${response.status})`,
+    );
+  }
+
+  return data;
+}
+
+function normalizeIconUrl(icon: string): string {
+  return icon.startsWith("//") ? `https:${icon}` : icon;
 }
 
 export async function geocodeCity(city: string): Promise<GeoResult> {
@@ -28,19 +81,14 @@ export async function geocodeCity(city: string): Promise<GeoResult> {
     throw new Error("Please enter a city name.");
   }
 
-  const url = new URL("https://geocoding-api.open-meteo.com/v1/search");
-  url.searchParams.set("name", trimmed);
-  url.searchParams.set("count", "1");
-  url.searchParams.set("language", "en");
-  url.searchParams.set("format", "json");
+  const url = new URL(`${WEATHER_API_BASE}/search.json`);
+  url.searchParams.set("key", getApiKey());
+  url.searchParams.set("q", trimmed);
 
   const response = await fetch(url.toString());
-  if (!response.ok) {
-    throw new Error(`Geocoding failed (${response.status})`);
-  }
+  const data = await parseWeatherApiResponse<SearchLocation[]>(response);
+  const result = data[0];
 
-  const data = (await response.json()) as GeocodingResponse;
-  const result = data.results?.[0];
   if (!result) {
     throw new Error(`No results found for "${trimmed}".`);
   }
@@ -48,8 +96,8 @@ export async function geocodeCity(city: string): Promise<GeoResult> {
   return {
     name: result.name,
     country: result.country,
-    latitude: result.latitude,
-    longitude: result.longitude,
+    latitude: result.lat,
+    longitude: result.lon,
   };
 }
 
@@ -57,32 +105,34 @@ export async function fetchWeather(
   latitude: number,
   longitude: number,
 ): Promise<WeatherData> {
-  const url = new URL("https://api.open-meteo.com/v1/forecast");
-  url.searchParams.set("latitude", String(latitude));
-  url.searchParams.set("longitude", String(longitude));
-  url.searchParams.set(
-    "current",
-    "weather_code,wind_speed_10m,temperature_2m",
-  );
-  url.searchParams.set("hourly", "weather_code,wind_speed_10m");
-  url.searchParams.set("forecast_days", "1");
-  url.searchParams.set("timezone", "auto");
+  const url = new URL(`${WEATHER_API_BASE}/forecast.json`);
+  url.searchParams.set("key", getApiKey());
+  url.searchParams.set("q", `${latitude},${longitude}`);
+  url.searchParams.set("days", "1");
+  url.searchParams.set("aqi", "no");
+  url.searchParams.set("alerts", "no");
 
   const response = await fetch(url.toString());
-  if (!response.ok) {
-    throw new Error(`Weather fetch failed (${response.status})`);
+  const data = await parseWeatherApiResponse<ForecastResponse>(response);
+
+  const current = data.current;
+  if (!current) {
+    throw new Error("WeatherAPI response did not include current conditions.");
   }
 
-  const data = (await response.json()) as ForecastResponse;
+  const hours = data.forecast?.forecastday?.[0]?.hour ?? [];
 
   return {
-    weatherCode: data.current.weather_code,
-    windSpeedKmh: data.current.wind_speed_10m,
-    temperatureC: data.current.temperature_2m,
+    weatherCode: current.condition.code,
+    conditionText: current.condition.text,
+    conditionIcon: normalizeIconUrl(current.condition.icon),
+    windSpeedKmh: current.wind_kph,
+    temperatureC: current.temp_c,
+    lastUpdated: current.last_updated,
     hourly: {
-      time: data.hourly.time,
-      weatherCode: data.hourly.weather_code,
-      windSpeedKmh: data.hourly.wind_speed_10m,
+      time: hours.map((hour) => hour.time),
+      weatherCode: hours.map((hour) => hour.condition.code),
+      windSpeedKmh: hours.map((hour) => hour.wind_kph),
     },
   };
 }

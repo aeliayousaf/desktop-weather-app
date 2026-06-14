@@ -1,3 +1,16 @@
+export type TemperatureUnit = "celsius" | "fahrenheit";
+
+export function formatTemperature(celsius: number, unit: TemperatureUnit): number {
+  if (unit === "fahrenheit") {
+    return Math.round((celsius * 9) / 5 + 32);
+  }
+  return Math.round(celsius);
+}
+
+export function temperatureUnitLabel(unit: TemperatureUnit): string {
+  return unit === "fahrenheit" ? "F" : "C";
+}
+
 export type WeatherAnimationType =
   | "sun"
   | "rain"
@@ -15,8 +28,11 @@ export interface GeoResult {
 
 export interface WeatherData {
   weatherCode: number;
+  conditionText: string;
+  conditionIcon: string;
   windSpeedKmh: number;
   temperatureC: number;
+  lastUpdated: string;
   hourly: {
     time: string[];
     weatherCode: number[];

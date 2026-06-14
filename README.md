@@ -7,7 +7,7 @@ A desktop weather overlay app built with Tauri, React, and TypeScript. It runs i
 - Transparent, frameless, always-on-top overlay
 - Click-through overlay (does not block mouse or keyboard)
 - System tray with Settings, Pause Animations, and Quit
-- Open-Meteo geocoding and weather data
+- [WeatherAPI.com](https://www.weatherapi.com/docs/) weather data
 - Animated effects: sun, rain, snow, cloud, lightning, wind
 - Configurable duration, intensity, sound, and per-animation toggles
 - Test buttons to preview each animation
@@ -34,6 +34,14 @@ npm run tauri:dev
 Or open **x64 Native Tools Command Prompt for VS** and run `npm run tauri dev` from there.
 
 ## Development
+
+1. Copy `.env.example` to `.env` and set your [WeatherAPI.com](https://www.weatherapi.com/docs/) key:
+
+```bash
+cp .env.example .env
+```
+
+2. Start the app:
 
 ```bash
 npm install

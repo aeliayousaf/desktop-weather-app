@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { WeatherAnimationType } from "../types/weather";
+import type { WeatherAnimationType, TemperatureUnit } from "../types/weather";
 import { ANIMATION_TYPES } from "../types/weather";
 import { syncSettingsToOverlay } from "../utils/overlayBridge";
 
@@ -12,6 +12,7 @@ export interface Settings {
   animationIntensity: number;
   soundEnabled: boolean;
   windThresholdKmh: number;
+  temperatureUnit: TemperatureUnit;
   paused: boolean;
   enabledAnimations: Record<WeatherAnimationType, boolean>;
 }
@@ -41,6 +42,7 @@ export function getSettingsSnapshot(state: SettingsState): Settings {
     animationIntensity: state.animationIntensity,
     soundEnabled: state.soundEnabled,
     windThresholdKmh: state.windThresholdKmh,
+    temperatureUnit: state.temperatureUnit,
     paused: state.paused,
     enabledAnimations: state.enabledAnimations,
   };
@@ -60,6 +62,7 @@ export const useSettingsStore = create<SettingsState>()(
       animationIntensity: 50,
       soundEnabled: false,
       windThresholdKmh: 35,
+      temperatureUnit: "celsius" as TemperatureUnit,
       paused: false,
       enabledAnimations: defaultEnabledAnimations,
 

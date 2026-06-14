@@ -50,6 +50,116 @@ body {
   margin-bottom: 12px;
 }
 
+.weather-indicator-main {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.weather-indicator-icon {
+  flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.25));
+}
+
+.weather-indicator-temp-block {
+  display: flex;
+  align-items: flex-start;
+  flex-shrink: 0;
+}
+
+.weather-indicator-temp {
+  font-size: 2.75rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: rgba(255, 255, 255, 0.98);
+}
+
+.weather-indicator-unit {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-top: 6px;
+  margin-left: 2px;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.weather-indicator-details {
+  min-width: 0;
+  flex: 1;
+}
+
+.weather-indicator-condition {
+  font-size: 1rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+  margin-bottom: 4px;
+}
+
+.weather-indicator-location {
+  font-size: 0.84rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 6px;
+}
+
+.weather-indicator-meta {
+  font-size: 0.76rem;
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1.4;
+}
+
+.weather-indicator-loading,
+.weather-indicator-refreshing {
+  font-size: 0.84rem;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.weather-indicator-error,
+.weather-indicator-error-inline {
+  font-size: 0.84rem;
+  color: #ffb4ab;
+}
+
+.weather-indicator-error-inline {
+  margin-top: 8px;
+}
+
+.temp-unit-toggle {
+  display: inline-flex;
+  padding: 3px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  gap: 4px;
+}
+
+.temp-unit-toggle button {
+  min-width: 44px;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.temp-unit-toggle button.active {
+  background: rgba(255, 255, 255, 0.92);
+  color: rgba(0, 0, 0, 0.88);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+}
+
+.temp-unit-toggle button:hover:not(.active) {
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.08);
+}
+
 .settings-field {
   margin-bottom: 14px;
 }
