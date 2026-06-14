@@ -2,6 +2,7 @@ import type { WeatherAnimationType } from "../types/weather";
 
 const WEATHER_SOUND_URLS: Partial<Record<WeatherAnimationType, string>> = {
   sun: "/sounds/sun.mp3",
+  partlyCloudy: "/sounds/sun.mp3",
   rain: "/sounds/rain.mp3",
   snow: "/sounds/snow.mp3",
   thunderstorm: "/sounds/thunderstorm.mp3",

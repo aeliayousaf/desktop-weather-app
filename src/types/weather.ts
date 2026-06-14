@@ -13,6 +13,7 @@ export function temperatureUnitLabel(unit: TemperatureUnit): string {
 
 export type WeatherAnimationType =
   | "sun"
+  | "partlyCloudy"
   | "rain"
   | "snow"
   | "cloud"
@@ -62,6 +63,7 @@ export const POLL_INTERVAL_MS = 2 * 60 * 1000;
 
 export const ANIMATION_TYPES: WeatherAnimationType[] = [
   "sun",
+  "partlyCloudy",
   "rain",
   "snow",
   "cloud",

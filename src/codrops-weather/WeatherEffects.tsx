@@ -1,4 +1,5 @@
 import type { WeatherAnimationType } from "../types/weather";
+import { PartlyCloudy } from "./PartlyCloudy";
 import { scaleFloat } from "./intensity";
 import { Clouds } from "./Clouds";
 import { Rain } from "./Rain";
@@ -24,6 +25,8 @@ export function WeatherEffects({ type, intensity }: WeatherEffectsProps) {
           <SunPostProcessing />
         </>
       );
+    case "partlyCloudy":
+      return <PartlyCloudy intensity={intensity} />;
     case "rain":
       return (
         <>

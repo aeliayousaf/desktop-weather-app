@@ -2,8 +2,9 @@ import type { WeatherAnimationType } from "../types/weather";
 
 // WeatherAPI.com condition codes — https://www.weatherapi.com/docs/weather_conditions.json
 const SUN_CODES = new Set([1000]);
+const PARTLY_CLOUDY_CODES = new Set([1003]);
 const CLOUD_CODES = new Set([
-  1003, 1006, 1009, 1012, 1015, 1018, 1021, 1024, 1027, 1030, 1033, 1036, 1039,
+  1006, 1009, 1012, 1015, 1018, 1021, 1024, 1027, 1030, 1033, 1036, 1039,
   1042, 1045, 1048, 1135, 1147,
 ]);
 const RAIN_CODES = new Set([
@@ -21,6 +22,7 @@ const SEVERITY: WeatherAnimationType[] = [
   "snow",
   "rain",
   "wind",
+  "partlyCloudy",
   "cloud",
   "sun",
 ];
@@ -36,7 +38,8 @@ function getTypesForCode(
   if (SNOW_CODES.has(code)) types.push("snow");
   if (RAIN_CODES.has(code)) types.push("rain");
   if (windSpeedKmh >= windThresholdKmh) types.push("wind");
-  if (CLOUD_CODES.has(code)) types.push("cloud");
+  if (PARTLY_CLOUDY_CODES.has(code)) types.push("partlyCloudy");
+  else if (CLOUD_CODES.has(code)) types.push("cloud");
   if (SUN_CODES.has(code)) types.push("sun");
 
   return types;

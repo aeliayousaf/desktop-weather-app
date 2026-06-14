@@ -17,16 +17,18 @@ export function CodropsWeatherScene({ type, intensity }: CodropsWeatherSceneProp
   const t = clampIntensity(intensity);
   const opacity = scaleFloat(0.72, 1, t);
 
+  const isSunLike = type === "sun" || type === "partlyCloudy";
+
   return (
     <div
-      className={`animation-layer codrops-weather-layer${type === "sun" ? " codrops-weather-layer--sun" : ""}`}
+      className={`animation-layer codrops-weather-layer${isSunLike ? " codrops-weather-layer--sun" : ""}`}
       style={{ opacity }}
     >
       <Canvas
         frameloop="always"
         dpr={[1, 1.5]}
         camera={
-          type === "sun"
+          isSunLike
             ? { position: [0, 0.15, 10.5], fov: 52 }
             : { position: [0, 1, 10], fov: 60 }
         }
@@ -43,8 +45,8 @@ export function CodropsWeatherScene({ type, intensity }: CodropsWeatherSceneProp
         }}
       >
         <Suspense fallback={null}>
-          {type === "sun" && <SunCameraRig />}
-          {type !== "sun" && (
+          {isSunLike && <SunCameraRig />}
+          {!isSunLike && (
             <>
               <ambientLight intensity={0.45} />
               <directionalLight position={[10, 10, 5]} intensity={0.85} color="#ffffff" />

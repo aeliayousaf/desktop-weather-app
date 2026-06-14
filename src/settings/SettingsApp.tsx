@@ -22,6 +22,7 @@ import "./liquidGlass.css";
 
 const ANIMATION_LABELS: Record<WeatherAnimationType, string> = {
   sun: "Sun",
+  partlyCloudy: "Partly Cloud",
   rain: "Rain",
   snow: "Snow",
   cloud: "Cloud",
@@ -31,6 +32,7 @@ const ANIMATION_LABELS: Record<WeatherAnimationType, string> = {
 
 const ANIMATION_ICONS: Record<WeatherAnimationType, string> = {
   sun: "☀️",
+  partlyCloudy: "⛅",
   rain: "🌧️",
   snow: "❄️",
   cloud: "☁️",
