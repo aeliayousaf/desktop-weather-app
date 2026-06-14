@@ -12,8 +12,9 @@ import {
 } from "../utils/overlayBridge";
 import { unlockWeatherAudio, playWeatherSound, stopWeatherSound } from "../utils/weatherSounds";
 import { ANIMATION_TYPES, type WeatherAnimationType } from "../types/weather";
-import "../styles/global.css";
+import { LiquidGlassCard, LiquidGlassProvider } from "./LiquidGlassCard";
 import "../styles/settings.css";
+import "./liquidGlass.css";
 
 const ANIMATION_LABELS: Record<WeatherAnimationType, string> = {
   sun: "Sun",
@@ -23,6 +24,44 @@ const ANIMATION_LABELS: Record<WeatherAnimationType, string> = {
   thunderstorm: "Thunderstorm",
   wind: "Wind",
 };
+
+const ANIMATION_ICONS: Record<WeatherAnimationType, string> = {
+  sun: "☀️",
+  rain: "🌧️",
+  snow: "❄️",
+  cloud: "☁️",
+  thunderstorm: "⛈️",
+  wind: "💨",
+};
+
+function SettingsToggle({
+  id,
+  checked,
+  onChange,
+  label,
+}: {
+  id: string;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+  label: string;
+}) {
+  return (
+    <div className="settings-row">
+      <label className="settings-row-label" htmlFor={id}>
+        {label}
+      </label>
+      <label className="settings-toggle">
+        <input
+          id={id}
+          type="checkbox"
+          checked={checked}
+          onChange={(e) => onChange(e.target.checked)}
+        />
+        <span className="settings-toggle-track" aria-hidden="true" />
+      </label>
+    </div>
+  );
+}
 
 export function SettingsApp() {
   const {
@@ -130,17 +169,18 @@ export function SettingsApp() {
   };
 
   return (
-    <div className="settings-root">
-      <header className="settings-header">
-        <h1>Weather Overlay</h1>
-        <p>
-          Animations play when weather changes. Use test buttons below for an
-          instant preview.
-        </p>
-      </header>
+    <LiquidGlassProvider>
+      <div className="settings-root">
+        <header className="settings-header">
+          <h1>Weather Overlay</h1>
+          <p>
+            Animations play when weather changes. Use test buttons below for an
+            instant preview.
+          </p>
+        </header>
 
-      <section className="settings-section">
-        <h2>Location</h2>
+        <LiquidGlassCard>
+          <h2 className="settings-section-title">Location</h2>
         <div className="settings-field">
           <label htmlFor="city">City</label>
           <input
@@ -166,10 +206,10 @@ export function SettingsApp() {
         >
           {loading ? "Saving..." : "Save Location"}
         </button>
-      </section>
+        </LiquidGlassCard>
 
-      <section className="settings-section">
-        <h2>Animation</h2>
+        <LiquidGlassCard>
+          <h2 className="settings-section-title">Animation</h2>
         <div className="settings-field">
           <label htmlFor="duration">
             Duration: {(animationDurationMs / 1000).toFixed(0)}s
@@ -199,53 +239,50 @@ export function SettingsApp() {
             }
           />
         </div>
-        <div className="settings-row">
-          <label htmlFor="sound">Enable sound</label>
-          <input
+          <SettingsToggle
             id="sound"
-            type="checkbox"
+            label="Enable sound"
             checked={soundEnabled}
-            onChange={(e) => {
-              updateSettings({ soundEnabled: e.target.checked });
-              if (e.target.checked) {
+            onChange={(checked) => {
+              updateSettings({ soundEnabled: checked });
+              if (checked) {
                 void unlockWeatherAudio();
               } else {
                 stopWeatherSound();
               }
             }}
           />
-        </div>
-      </section>
+        </LiquidGlassCard>
 
-      <section className="settings-section">
-        <h2>Enabled Animations</h2>
-        {ANIMATION_TYPES.map((type) => (
-          <div key={type} className="settings-row">
-            <label htmlFor={`anim-${type}`}>{ANIMATION_LABELS[type]}</label>
-            <input
+        <LiquidGlassCard>
+          <h2 className="settings-section-title">Enabled Animations</h2>
+          {ANIMATION_TYPES.map((type) => (
+            <SettingsToggle
+              key={type}
               id={`anim-${type}`}
-              type="checkbox"
+              label={ANIMATION_LABELS[type]}
               checked={enabledAnimations[type]}
               onChange={() => toggleAnimationType(type)}
             />
-          </div>
-        ))}
-      </section>
-
-      <section className="settings-section">
-        <h2>Test Animations</h2>
-        <div className="test-grid">
-          {ANIMATION_TYPES.map((type) => (
-            <button
-              key={type}
-              className="settings-btn settings-btn-secondary"
-              onClick={() => handleTestAnimation(type)}
-            >
-              {ANIMATION_LABELS[type]}
-            </button>
           ))}
-        </div>
-      </section>
-    </div>
+        </LiquidGlassCard>
+
+        <LiquidGlassCard>
+          <h2 className="settings-section-title">Test Animations</h2>
+          <div className="test-grid">
+            {ANIMATION_TYPES.map((type) => (
+              <button
+                key={type}
+                className="settings-btn settings-btn-secondary"
+                onClick={() => handleTestAnimation(type)}
+              >
+                <span aria-hidden="true">{ANIMATION_ICONS[type]}</span>
+                {ANIMATION_LABELS[type]}
+              </button>
+            ))}
+          </div>
+        </LiquidGlassCard>
+      </div>
+    </LiquidGlassProvider>
   );
 }

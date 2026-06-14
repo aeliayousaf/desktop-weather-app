@@ -4,6 +4,8 @@ import * as THREE from "three";
 import type { WeatherAnimationType } from "../types/weather";
 import { WeatherEffects } from "./WeatherEffects";
 import { SunCameraRig } from "./SunCameraRig";
+import { TumbleweedOverlay } from "./TumbleweedOverlay";
+import { UmbrellaOverlay } from "./UmbrellaOverlay";
 import { clampIntensity, scaleFloat } from "./intensity";
 
 interface CodropsWeatherSceneProps {
@@ -51,6 +53,12 @@ export function CodropsWeatherScene({ type, intensity }: CodropsWeatherSceneProp
           <WeatherEffects type={type} intensity={t} />
         </Suspense>
       </Canvas>
+      {type === "wind" && (
+        <>
+          <UmbrellaOverlay intensity={t} />
+          <TumbleweedOverlay intensity={t} />
+        </>
+      )}
     </div>
   );
 }

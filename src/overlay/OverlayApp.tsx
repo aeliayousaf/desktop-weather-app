@@ -13,8 +13,29 @@ export function OverlayApp() {
   } = useWeatherWatcher();
 
   useEffect(() => {
-    const window = getCurrentWebviewWindow();
-    void window.setIgnoreCursorEvents(true);
+    const win = getCurrentWebviewWindow();
+
+    const keepOverlayOnTop = async () => {
+      await win.setBackgroundColor([0, 0, 0, 0]);
+      await win.setAlwaysOnTop(true);
+      await win.setIgnoreCursorEvents(true);
+    };
+
+    void keepOverlayOnTop();
+
+    const interval = window.setInterval(() => {
+      void keepOverlayOnTop();
+    }, 2500);
+
+    const onFocus = () => {
+      void keepOverlayOnTop();
+    };
+    window.addEventListener("focus", onFocus);
+
+    return () => {
+      window.clearInterval(interval);
+      window.removeEventListener("focus", onFocus);
+    };
   }, []);
 
   return (

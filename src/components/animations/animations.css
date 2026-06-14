@@ -86,6 +86,50 @@
   height: 100% !important;
 }
 
+.wind-prop-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.tumbleweed-sprite {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  will-change: transform;
+  transform-origin: center center;
+  opacity: 0.96;
+}
+
+.tumbleweed-sprite img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.umbrella-sprite {
+  position: absolute;
+  left: 0;
+  top: 0;
+  will-change: transform;
+  transform-origin: 55% 62%;
+  opacity: 0.94;
+  filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.18));
+}
+
+.umbrella-sprite img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
 /* Clouds — volumetric ray-marched layer in upper band */
 .cloud-volumetric-layer {
   mask-image: linear-gradient(to bottom, black 0%, black 48%, transparent 70%);

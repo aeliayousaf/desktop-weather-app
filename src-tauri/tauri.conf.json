@@ -19,7 +19,8 @@
         "decorations": false,
         "alwaysOnTop": true,
         "skipTaskbar": true,
-        "fullscreen": true,
+        "fullscreen": false,
+        "maximized": true,
         "resizable": false,
         "shadow": false,
         "visible": true,
@@ -35,7 +36,13 @@
         "visible": false,
         "center": true,
         "decorations": true,
-        "resizable": true
+        "resizable": true,
+        "transparent": true,
+        "shadow": false,
+        "windowEffects": {
+          "effects": ["acrylic"],
+          "color": [255, 255, 255, 40]
+        }
       }
     ],
     "security": {

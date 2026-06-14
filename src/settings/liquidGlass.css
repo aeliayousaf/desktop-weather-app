@@ -1,0 +1,43 @@
+.liquid-glass-card {
+  position: relative;
+  margin-bottom: 14px;
+  border-radius: 24px;
+  isolation: isolate;
+  overflow: hidden;
+  box-shadow:
+    0 12px 36px rgba(0, 0, 0, 0.28),
+    0 2px 8px rgba(0, 0, 0, 0.16);
+}
+
+.liquid-glass-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.14) 0%,
+    rgba(255, 255, 255, 0.05) 48%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
+}
+
+.liquid-glass-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow:
+    inset 5px 5px 0 -5px rgba(255, 255, 255, 0.4),
+    inset 0 0 10px 1px rgba(255, 255, 255, 0.18);
+}
+
+.liquid-glass-card-content {
+  position: relative;
+  z-index: 2;
+  padding: 16px;
+}
