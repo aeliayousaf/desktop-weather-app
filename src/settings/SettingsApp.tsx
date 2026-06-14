@@ -227,7 +227,7 @@ export function SettingsApp() {
             checked={minimalMode}
             onChange={(checked) => {
               updateSettings({ minimalMode: checked });
-              void applyMinimalMode(checked);
+              void applyMinimalMode(checked, { hideSettings: checked });
             }}
           />
           <p className="settings-hint">

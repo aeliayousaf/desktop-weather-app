@@ -31,7 +31,11 @@ fn position_widget(window: &tauri::WebviewWindow) {
 }
 
 #[tauri::command]
-pub fn set_minimal_mode(app: AppHandle, enabled: bool) -> Result<(), String> {
+pub fn set_minimal_mode(
+    app: AppHandle,
+    enabled: bool,
+    hide_settings: bool,
+) -> Result<(), String> {
     let widget = app
         .get_webview_window("widget")
         .ok_or("widget window not found")?;
@@ -46,8 +50,11 @@ pub fn set_minimal_mode(app: AppHandle, enabled: bool) -> Result<(), String> {
             .set_always_on_top(true)
             .map_err(|error| error.to_string())?;
         widget.show().map_err(|error| error.to_string())?;
-        widget.set_focus().map_err(|error| error.to_string())?;
-        settings.hide().map_err(|error| error.to_string())?;
+
+        if hide_settings {
+            settings.hide().map_err(|error| error.to_string())?;
+            widget.set_focus().map_err(|error| error.to_string())?;
+        }
     } else {
         widget.hide().map_err(|error| error.to_string())?;
     }

@@ -4,6 +4,7 @@ import { TemperatureUnitToggle } from "../components/TemperatureUnitToggle";
 import {
   getSettingsSnapshot,
   useSettingsStore,
+  type Settings,
 } from "../store/settingsStore";
 import { syncSettingsToOverlay } from "../utils/overlayBridge";
 import { applyMinimalMode, openFullSettings } from "../utils/minimalMode";
@@ -15,7 +16,7 @@ import "../styles/widget.css";
 import "../settings/liquidGlass.css";
 
 export function WidgetApp() {
-  const { city, latitude, longitude, temperatureUnit, minimalMode, updateSettings } =
+  const { city, latitude, longitude, temperatureUnit, updateSettings } =
     useSettingsStore();
   const { weather, loading, error } = useCurrentWeather(latitude, longitude);
 
@@ -31,19 +32,20 @@ export function WidgetApp() {
   useEffect(() => {
     const win = getCurrentWebviewWindow();
 
-    const unlisten = win.listen<{ minimalMode?: boolean }>("settings-sync", (event) => {
+    const unlisten = win.listen<Settings>("settings-sync", (event) => {
+      const previousMinimalMode = useSettingsStore.getState().minimalMode;
       useSettingsStore.setState(event.payload);
-      void applyMinimalMode(event.payload.minimalMode ?? false);
+
+      const nextMinimalMode = event.payload.minimalMode;
+      if (nextMinimalMode !== previousMinimalMode) {
+        void applyMinimalMode(nextMinimalMode, { hideSettings: nextMinimalMode });
+      }
     });
 
     return () => {
       void unlisten.then((fn) => fn());
     };
   }, []);
-
-  useEffect(() => {
-    void applyMinimalMode(minimalMode);
-  }, [minimalMode]);
 
   const handleDragStart = (event: PointerEvent<HTMLElement>) => {
     if (event.button !== 0) return;
