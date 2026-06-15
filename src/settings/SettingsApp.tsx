@@ -5,7 +5,6 @@ import {
   useSettingsStore,
 } from "../store/settingsStore";
 import { fetchWeather, geocodeCity } from "../services/weatherService";
-import { mapWeatherToAnimation } from "../utils/weatherCodeMapper";
 import {
   syncSettingsToOverlay,
   triggerOverlayTestAnimation,
@@ -78,7 +77,6 @@ export function SettingsApp() {
     animationDurationMs,
     animationIntensity,
     soundEnabled,
-    windThresholdKmh,
     temperatureUnit,
     minimalMode,
     enabledAnimations,
@@ -167,25 +165,8 @@ export function SettingsApp() {
       useSettingsStore.getState().setIsDay(weather.isDay);
       setWeather(snapshot);
       void emitWeatherUpdate(snapshot);
-      const currentAnimation = mapWeatherToAnimation(
-        weather.weatherCode,
-        weather.windSpeedKmh,
-        windThresholdKmh,
-      );
 
-      if (currentAnimation) {
-        if (useSettingsStore.getState().soundEnabled) {
-          void unlockWeatherAudio();
-          void playWeatherSound(currentAnimation);
-        }
-        await triggerOverlayTestAnimation(currentAnimation, animationIntensity);
-      }
-
-      setSuccess(
-        currentAnimation
-          ? `Location set to ${locationLabel}. Playing a preview of current weather (${ANIMATION_LABELS[currentAnimation]}).`
-          : `Location set to ${locationLabel}.`,
-      );
+      setSuccess(`Location set to ${locationLabel}.`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to geocode city");
     } finally {

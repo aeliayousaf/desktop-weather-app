@@ -43,8 +43,12 @@ export function useWeatherWatcher() {
       );
 
       if (isFirstFetchRef.current) {
-        lastConditionRef.current = condition;
         isFirstFetchRef.current = false;
+        lastConditionRef.current = condition;
+        const { paused: isPaused, enabledAnimations } = useSettingsStore.getState();
+        if (condition && !isPaused && enabledAnimations[condition]) {
+          setActiveAnimation(condition);
+        }
         return;
       }
 
