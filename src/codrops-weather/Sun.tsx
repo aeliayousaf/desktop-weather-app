@@ -3,6 +3,7 @@ import { useFrame, useLoader } from "@react-three/fiber";
 import { useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { SUN_POSITION, SUN_RADIUS } from "./sunConfig";
+import { scaleFloat } from "./intensity";
 
 interface SunProps {
   intensity?: number;
@@ -29,10 +30,12 @@ function createHaloTexture(): THREE.CanvasTexture {
   return texture;
 }
 
-export function Sun({ intensity: _intensity = 50 }: SunProps) {
+export function Sun({ intensity = 50 }: SunProps) {
   const sunRef = useRef<THREE.Mesh>(null!);
   const sunTexture = useLoader(THREE.TextureLoader, "/textures/sun_2k.jpg");
   const haloTexture = useMemo(() => createHaloTexture(), []);
+  const haloOpacity = scaleFloat(0.35, 0.7, intensity);
+  const lightIntensity = scaleFloat(1.6, 3.2, intensity);
 
   useLayoutEffect(() => {
     sunTexture.colorSpace = THREE.SRGBColorSpace;
@@ -52,11 +55,11 @@ export function Sun({ intensity: _intensity = 50 }: SunProps) {
       new THREE.SpriteMaterial({
         map: haloTexture,
         transparent: true,
-        opacity: 0.55,
+        opacity: haloOpacity,
         blending: THREE.AdditiveBlending,
         depthWrite: false,
       }),
-    [haloTexture],
+    [haloTexture, haloOpacity],
   );
 
   useFrame((state) => {
@@ -69,7 +72,7 @@ export function Sun({ intensity: _intensity = 50 }: SunProps) {
     <group position={SUN_POSITION} userData={{ lensflare: "no-occlusion" }}>
       <sprite position={[0, 0, -0.5]} scale={[7.5, 7.5, 1]} material={haloMaterial} />
       <Sphere ref={sunRef} args={[SUN_RADIUS, 32, 32]} material={sunMaterial} />
-      <pointLight position={[0, 0, 0]} intensity={2.5} color="#FFD700" distance={25} />
+      <pointLight position={[0, 0, 0]} intensity={lightIntensity} color="#FFD700" distance={25} />
     </group>
   );
 }

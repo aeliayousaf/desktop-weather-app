@@ -1,4 +1,5 @@
 import type { WeatherAnimationType } from "../types/weather";
+import { useSettingsStore } from "../store/settingsStore";
 
 const WEATHER_SOUND_URLS: Partial<Record<WeatherAnimationType, string>> = {
   sun: "/sounds/sun.mp3",
@@ -8,6 +9,16 @@ const WEATHER_SOUND_URLS: Partial<Record<WeatherAnimationType, string>> = {
   thunderstorm: "/sounds/thunderstorm.mp3",
   wind: "/sounds/wind.mp3",
 };
+
+const MOON_SOUND_URL = "/sounds/moon.mp3";
+
+function resolveSoundPath(type: WeatherAnimationType, isDayOverride?: boolean): string | undefined {
+  const isDay = isDayOverride ?? useSettingsStore.getState().isDay;
+  if ((type === "sun" || type === "partlyCloudy") && !isDay) {
+    return MOON_SOUND_URL;
+  }
+  return WEATHER_SOUND_URLS[type];
+}
 
 let activeAudio: HTMLAudioElement | null = null;
 let audioUnlocked = false;
@@ -72,10 +83,13 @@ function waitForAudioReady(audio: HTMLAudioElement): Promise<void> {
   });
 }
 
-export async function playWeatherSound(type: WeatherAnimationType): Promise<void> {
+export async function playWeatherSound(
+  type: WeatherAnimationType,
+  isDayOverride?: boolean,
+): Promise<void> {
   stopActiveAudio();
 
-  const path = WEATHER_SOUND_URLS[type];
+  const path = resolveSoundPath(type, isDayOverride);
   if (!path) return;
 
   const audio = new Audio(resolveSoundUrl(path));

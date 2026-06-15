@@ -9,6 +9,7 @@ import { mapWeatherToAnimation } from "../utils/weatherCodeMapper";
 import {
   syncSettingsToOverlay,
   triggerOverlayTestAnimation,
+  emitWeatherUpdate,
 } from "../utils/overlayBridge";
 import { unlockWeatherAudio, playWeatherSound, stopWeatherSound } from "../utils/weatherSounds";
 import { applyMinimalMode, showSettingsOnStartup } from "../utils/minimalMode";
@@ -128,12 +129,12 @@ export function SettingsApp() {
   useEffect(() => {
     const overlay = getCurrentWebviewWindow();
 
-    const unlistenPlay = overlay.listen<{ type: WeatherAnimationType }>(
+    const unlistenPlay = overlay.listen<{ type: WeatherAnimationType; isDay?: boolean }>(
       "play-weather-sound",
       (event) => {
         const { soundEnabled } = useSettingsStore.getState();
         if (!soundEnabled) return;
-        void playWeatherSound(event.payload.type);
+        void playWeatherSound(event.payload.type, event.payload.isDay);
       },
     );
 
@@ -159,10 +160,13 @@ export function SettingsApp() {
       setCity(locationLabel);
 
       const weather = await fetchWeather(result.latitude, result.longitude);
-      setWeather({
+      const snapshot = {
         ...weather,
         fetchedAt: new Date().toISOString(),
-      });
+      };
+      useSettingsStore.getState().setIsDay(weather.isDay);
+      setWeather(snapshot);
+      void emitWeatherUpdate(snapshot);
       const currentAnimation = mapWeatherToAnimation(
         weather.weatherCode,
         weather.windSpeedKmh,
@@ -350,8 +354,25 @@ export function SettingsApp() {
                 className="settings-btn settings-btn-secondary"
                 onClick={() => handleTestAnimation(type)}
               >
-                <span aria-hidden="true">{ANIMATION_ICONS[type]}</span>
-                {ANIMATION_LABELS[type]}
+                <span aria-hidden="true" className="test-celestial-icons">
+                  {type === "sun" ? (
+                    <>
+                      <span>☀️</span>
+                      <svg
+                        className="test-celestial-moon"
+                        viewBox="0 0 24 24"
+                        width="1.1em"
+                        height="1.1em"
+                        fill="currentColor"
+                      >
+                        <path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z" />
+                      </svg>
+                    </>
+                  ) : (
+                    ANIMATION_ICONS[type]
+                  )}
+                </span>
+                {type === "sun" ? "Sun / Moon" : ANIMATION_LABELS[type]}
               </button>
             ))}
           </div>

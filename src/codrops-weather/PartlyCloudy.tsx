@@ -1,8 +1,8 @@
 import { Cloud, Clouds as DreiClouds } from "@react-three/drei";
 import * as THREE from "three";
-import { Sun } from "./Sun";
-import { SunEnvironment } from "./SunEnvironment";
-import { SunPostProcessing } from "./SunPostProcessing";
+import { CelestialBody } from "./CelestialBody";
+import { CelestialEnvironment } from "./CelestialEnvironment";
+import { CelestialPostProcessing } from "./CelestialPostProcessing";
 import { scaleFloat } from "./intensity";
 
 interface PartlyCloudyProps {
@@ -15,7 +15,7 @@ export function PartlyCloudy({ intensity }: PartlyCloudyProps) {
 
   return (
     <>
-      <SunEnvironment />
+      <CelestialEnvironment />
 
       <DreiClouds material={THREE.MeshLambertMaterial}>
         <Cloud
@@ -50,7 +50,7 @@ export function PartlyCloudy({ intensity }: PartlyCloudyProps) {
         />
       </DreiClouds>
 
-      <Sun intensity={intensity} />
+      <CelestialBody intensity={intensity} />
 
       <DreiClouds material={THREE.MeshLambertMaterial}>
         <Cloud
@@ -85,7 +85,7 @@ export function PartlyCloudy({ intensity }: PartlyCloudyProps) {
         />
       </DreiClouds>
 
-      <SunPostProcessing />
+      <CelestialPostProcessing />
     </>
   );
 }

@@ -45,7 +45,7 @@ export function OverlayApp() {
         onComplete={clearActiveAnimation}
       />
       <AnimationOrchestrator
-        key={testAnimation ? `${testAnimation.id}-${testAnimation.intensity}` : "test-idle"}
+        key={testAnimation ? String(testAnimation.id) : "test-idle"}
         activeType={testAnimation?.type ?? null}
         onComplete={clearTestAnimation}
         forcePlay

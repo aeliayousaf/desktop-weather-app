@@ -28,6 +28,7 @@ interface ForecastResponse extends WeatherApiError {
   };
   current?: {
     last_updated: string;
+    is_day: number;
     temp_c: number;
     wind_kph: number;
     condition: {
@@ -128,6 +129,7 @@ export async function fetchWeather(
     conditionIcon: normalizeIconUrl(current.condition.icon),
     windSpeedKmh: current.wind_kph,
     temperatureC: current.temp_c,
+    isDay: current.is_day === 1,
     lastUpdated: current.last_updated,
     hourly: {
       time: hours.map((hour) => hour.time),

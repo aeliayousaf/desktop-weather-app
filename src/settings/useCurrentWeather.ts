@@ -3,6 +3,8 @@ import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { fetchWeather } from "../services/weatherService";
 import type { WeatherSnapshot } from "../types/weather";
 import { POLL_INTERVAL_MS } from "../types/weather";
+import { emitWeatherUpdate } from "../utils/overlayBridge";
+import { useSettingsStore } from "../store/settingsStore";
 
 export function useCurrentWeather(latitude: number | null, longitude: number | null) {
   const [weather, setWeather] = useState<WeatherSnapshot | null>(null);
@@ -24,10 +26,13 @@ export function useCurrentWeather(latitude: number | null, longitude: number | n
     setLoading(true);
     try {
       const data = await fetchWeather(latitude, longitude);
-      applySnapshot({
+      const snapshot = {
         ...data,
         fetchedAt: new Date().toISOString(),
-      });
+      };
+      useSettingsStore.getState().setIsDay(data.isDay);
+      void emitWeatherUpdate(snapshot);
+      applySnapshot(snapshot);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load weather");
     } finally {

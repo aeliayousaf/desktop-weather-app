@@ -25,8 +25,13 @@ export function triggerOverlayTestAnimation(
   return emitTo(OVERLAY_WINDOW_LABEL, "trigger-test-animation", { type, id, intensity });
 }
 
-export function requestWeatherSound(type: WeatherAnimationType) {
-  return emitTo(SETTINGS_WINDOW_LABEL, "play-weather-sound", { type });
+export interface PlayWeatherSoundEvent {
+  type: WeatherAnimationType;
+  isDay?: boolean;
+}
+
+export function requestWeatherSound(type: WeatherAnimationType, isDay?: boolean) {
+  return emitTo(SETTINGS_WINDOW_LABEL, "play-weather-sound", { type, isDay });
 }
 
 export function requestStopWeatherSound() {
@@ -36,4 +41,5 @@ export function requestStopWeatherSound() {
 export function emitWeatherUpdate(weather: WeatherSnapshot) {
   void emitTo(SETTINGS_WINDOW_LABEL, "weather-updated", weather);
   void emitTo(WIDGET_WINDOW_LABEL, "weather-updated", weather);
+  void emitTo(OVERLAY_WINDOW_LABEL, "weather-updated", weather);
 }

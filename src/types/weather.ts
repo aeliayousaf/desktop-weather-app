@@ -33,6 +33,7 @@ export interface WeatherData {
   conditionIcon: string;
   windSpeedKmh: number;
   temperatureC: number;
+  isDay: boolean;
   lastUpdated: string;
   hourly: {
     time: string[];

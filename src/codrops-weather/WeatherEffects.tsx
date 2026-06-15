@@ -4,11 +4,11 @@ import { scaleFloat } from "./intensity";
 import { Clouds } from "./Clouds";
 import { Rain } from "./Rain";
 import { Snow } from "./Snow";
-import { Sun } from "./Sun";
-import { SunEnvironment } from "./SunEnvironment";
+import { CelestialBody } from "./CelestialBody";
+import { CelestialEnvironment } from "./CelestialEnvironment";
 import { Thunderstorm } from "./Thunderstorm";
 import { Wind } from "./Wind";
-import { SunPostProcessing } from "./SunPostProcessing";
+import { CelestialPostProcessing } from "./CelestialPostProcessing";
 
 interface WeatherEffectsProps {
   type: WeatherAnimationType;
@@ -20,9 +20,9 @@ export function WeatherEffects({ type, intensity }: WeatherEffectsProps) {
     case "sun":
       return (
         <>
-          <SunEnvironment />
-          <Sun intensity={intensity} />
-          <SunPostProcessing />
+          <CelestialEnvironment />
+          <CelestialBody intensity={intensity} />
+          <CelestialPostProcessing />
         </>
       );
     case "partlyCloudy":

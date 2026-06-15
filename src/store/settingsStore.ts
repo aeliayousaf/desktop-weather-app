@@ -19,10 +19,13 @@ export interface Settings {
 }
 
 interface SettingsState extends Settings {
+  /** Whether it is daytime at the saved location (from WeatherAPI). Not persisted. */
+  isDay: boolean;
   setCity: (city: string) => void;
   setLocation: (lat: number, lon: number, city: string) => void;
   updateSettings: (partial: Partial<Settings>) => void;
   setPaused: (paused: boolean) => void;
+  setIsDay: (isDay: boolean) => void;
   toggleAnimationType: (type: WeatherAnimationType) => void;
 }
 
@@ -68,6 +71,7 @@ export const useSettingsStore = create<SettingsState>()(
       minimalMode: false,
       paused: false,
       enabledAnimations: defaultEnabledAnimations,
+      isDay: true,
 
       setCity: (city) => {
         set({ city });
@@ -89,6 +93,10 @@ export const useSettingsStore = create<SettingsState>()(
         notifyOverlay(get());
       },
 
+      setIsDay: (isDay) => {
+        set({ isDay });
+      },
+
       toggleAnimationType: (type) => {
         const current = get().enabledAnimations[type];
         set({
@@ -102,6 +110,19 @@ export const useSettingsStore = create<SettingsState>()(
     }),
     {
       name: "weather-overlay-settings",
+      partialize: (state) => ({
+        city: state.city,
+        latitude: state.latitude,
+        longitude: state.longitude,
+        animationDurationMs: state.animationDurationMs,
+        animationIntensity: state.animationIntensity,
+        soundEnabled: state.soundEnabled,
+        windThresholdKmh: state.windThresholdKmh,
+        temperatureUnit: state.temperatureUnit,
+        minimalMode: state.minimalMode,
+        paused: state.paused,
+        enabledAnimations: state.enabledAnimations,
+      }),
       merge: (persistedState, currentState) => {
         const persisted = persistedState as Partial<SettingsState> | undefined;
         return {

@@ -6,7 +6,7 @@ import { useSettingsStore, type Settings } from "../store/settingsStore";
 import { mapWeatherToAnimation } from "../utils/weatherCodeMapper";
 import type { TestAnimationEvent } from "../utils/overlayBridge";
 import { emitWeatherUpdate } from "../utils/overlayBridge";
-import type { WeatherAnimationType } from "../types/weather";
+import type { WeatherAnimationType, WeatherSnapshot } from "../types/weather";
 import { POLL_INTERVAL_MS } from "../types/weather";
 
 export function useWeatherWatcher() {
@@ -33,6 +33,7 @@ export function useWeatherWatcher() {
         ...weather,
         fetchedAt: new Date().toISOString(),
       };
+      useSettingsStore.getState().setIsDay(weather.isDay);
       void emitWeatherUpdate(snapshot);
 
       const condition = mapWeatherToAnimation(
@@ -59,10 +60,6 @@ export function useWeatherWatcher() {
   }, []);
 
   useEffect(() => {
-    void useSettingsStore.persist.rehydrate();
-  }, []);
-
-  useEffect(() => {
     if (latitude == null || longitude == null) return;
 
     void checkWeather();
@@ -83,7 +80,6 @@ export function useWeatherWatcher() {
     const unlistenTest = overlay.listen<TestAnimationEvent>(
       "trigger-test-animation",
       (event) => {
-        useSettingsStore.setState({ animationIntensity: event.payload.intensity });
         setTestAnimation(event.payload);
       },
     );
@@ -92,10 +88,15 @@ export function useWeatherWatcher() {
       useSettingsStore.setState({ paused: event.payload });
     });
 
+    const unlistenWeather = overlay.listen<WeatherSnapshot>("weather-updated", (event) => {
+      useSettingsStore.getState().setIsDay(event.payload.isDay);
+    });
+
     return () => {
       void unlistenSync.then((fn) => fn());
       void unlistenTest.then((fn) => fn());
       void unlistenPause.then((fn) => fn());
+      void unlistenWeather.then((fn) => fn());
     };
   }, []);
 

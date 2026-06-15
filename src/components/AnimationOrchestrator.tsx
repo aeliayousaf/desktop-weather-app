@@ -43,7 +43,7 @@ export function AnimationOrchestrator({
     setVisible(true);
 
     if (soundEnabled && !forcePlay) {
-      void requestWeatherSound(activeType);
+      void requestWeatherSound(activeType, useSettingsStore.getState().isDay);
     }
 
     const fadeTimer = window.setTimeout(() => {
@@ -51,6 +51,7 @@ export function AnimationOrchestrator({
     }, animationDurationMs);
 
     const completeTimer = window.setTimeout(() => {
+      void requestStopWeatherSound();
       setCurrentType(null);
       onCompleteRef.current();
     }, animationDurationMs + FADE_MS);
@@ -58,9 +59,7 @@ export function AnimationOrchestrator({
     return () => {
       window.clearTimeout(fadeTimer);
       window.clearTimeout(completeTimer);
-      if (soundEnabled) {
-        void requestStopWeatherSound();
-      }
+      void requestStopWeatherSound();
     };
   }, [
     activeType,
@@ -83,7 +82,11 @@ export function AnimationOrchestrator({
           className="overlay-root"
         >
           <Suspense fallback={null}>
-            <CodropsWeatherAnimation type={currentType} intensity={animationIntensity} />
+            <CodropsWeatherAnimation
+              key={`${currentType}-${animationIntensity}`}
+              type={currentType}
+              intensity={animationIntensity}
+            />
           </Suspense>
         </motion.div>
       )}
