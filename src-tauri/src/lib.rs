@@ -1,12 +1,15 @@
 mod commands;
 
-use commands::{open_settings_window, set_minimal_mode, show_settings_on_startup};
+use commands::{
+    ensure_overlay_on_top, ensure_overlay_stack, open_settings_window, set_minimal_mode,
+    set_settings_window_effects, set_widget_window_effects, show_settings_on_startup,
+};
 use tauri::{
     image::Image,
     include_image,
     menu::{CheckMenuItem, Menu, MenuItem},
     tray::TrayIconBuilder,
-    window::{Color, Effect, EffectsBuilder},
+    window::Color,
     Emitter, Manager, PhysicalPosition,
 };
 
@@ -14,21 +17,6 @@ const TRAY_ICON: Image<'static> = include_image!("icons/tray-32.png");
 const WINDOW_ICON: Image<'static> = include_image!("icons/128x128.png");
 const WIDGET_WIDTH: i32 = 400;
 const WIDGET_MARGIN: i32 = 24;
-
-fn prepare_widget_window(window: &tauri::WebviewWindow) {
-    let _ = window.set_background_color(Some(Color(0, 0, 0, 0)));
-    let _ = window.set_effects(None::<tauri::utils::config::WindowEffectsConfig>);
-}
-
-fn apply_settings_effects(window: &tauri::WebviewWindow) {
-    let _ = window.set_background_color(Some(Color(0, 0, 0, 0)));
-    let _ = window.set_effects(
-        EffectsBuilder::new()
-            .effect(Effect::Acrylic)
-            .color(Color(255, 255, 255, 40))
-            .build(),
-    );
-}
 
 fn position_widget(window: &tauri::WebviewWindow) {
     if let Ok(Some(monitor)) = window.current_monitor() {
@@ -46,6 +34,7 @@ pub fn run() {
             set_minimal_mode,
             open_settings_window,
             show_settings_on_startup,
+            ensure_overlay_on_top,
         ])
         .setup(|app| {
             let settings_item =
@@ -100,30 +89,70 @@ pub fn run() {
 
             if let Some(settings) = app.get_webview_window("settings") {
                 let _ = settings.set_icon(WINDOW_ICON.clone());
-                apply_settings_effects(&settings);
+                set_settings_window_effects(&settings, false);
 
                 let app_handle = app.handle().clone();
                 settings.on_window_event(move |event| {
-                    if let tauri::WindowEvent::CloseRequested { api, .. } = event {
-                        api.prevent_close();
-
-                        if let Some(settings) = app_handle.get_webview_window("settings") {
-                            let _ = settings.hide();
+                    match event {
+                        tauri::WindowEvent::Focused(focused) => {
+                            if let Some(settings) =
+                                app_handle.get_webview_window("settings")
+                            {
+                                set_settings_window_effects(&settings, *focused);
+                            }
                         }
+                        tauri::WindowEvent::CloseRequested { api, .. } => {
+                            api.prevent_close();
 
-                        if let Some(overlay) = app_handle.get_webview_window("overlay") {
-                            let _ = overlay.set_always_on_top(true);
-                            let _ = overlay.show();
+                            if let Some(settings) =
+                                app_handle.get_webview_window("settings")
+                            {
+                                let _ = settings.hide();
+                                set_settings_window_effects(&settings, false);
+                            }
+
+                            ensure_overlay_stack(&app_handle);
                         }
+                        _ => {}
                     }
                 });
             }
 
             if let Some(widget) = app.get_webview_window("widget") {
-                prepare_widget_window(&widget);
+                set_widget_window_effects(&widget, false);
                 position_widget(&widget);
                 let _ = widget.set_always_on_top(true);
+
+                let app_handle = app.handle().clone();
+                widget.on_window_event(move |event| {
+                    match event {
+                        tauri::WindowEvent::Focused(focused) => {
+                            if let Some(widget) = app_handle.get_webview_window("widget") {
+                                set_widget_window_effects(&widget, *focused);
+                            }
+                            ensure_overlay_stack(&app_handle);
+                        }
+                        tauri::WindowEvent::Moved(_)
+                        | tauri::WindowEvent::Resized(_)
+                        | tauri::WindowEvent::ScaleFactorChanged { .. } => {
+                            ensure_overlay_stack(&app_handle);
+                        }
+                        _ => {}
+                    }
+                });
             }
+
+            let app_handle = app.handle().clone();
+            std::thread::spawn(move || {
+                loop {
+                    std::thread::sleep(std::time::Duration::from_secs(1));
+                    let handle = app_handle.clone();
+                    let stack_handle = handle.clone();
+                    let _ = handle.run_on_main_thread(move || {
+                        ensure_overlay_stack(&stack_handle);
+                    });
+                }
+            });
 
             Ok(())
         })

@@ -8,6 +8,7 @@ import {
 } from "../store/settingsStore";
 import { syncSettingsToOverlay } from "../utils/overlayBridge";
 import { applyMinimalMode, openFullSettings } from "../utils/minimalMode";
+import { ensureOverlayOnTop } from "../utils/overlayStack";
 import { LiquidGlassCard, LiquidGlassProvider } from "../settings/LiquidGlassCard";
 import { useCurrentWeather } from "../settings/useCurrentWeather";
 import { WeatherIndicator } from "../settings/WeatherIndicator";
@@ -27,6 +28,16 @@ export function WidgetApp() {
       await syncSettingsToOverlay(getSettingsSnapshot(state));
       await applyMinimalMode(state.minimalMode);
     })();
+  }, []);
+
+  useEffect(() => {
+    void ensureOverlayOnTop();
+
+    const interval = window.setInterval(() => {
+      void ensureOverlayOnTop();
+    }, 1000);
+
+    return () => window.clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -56,6 +67,7 @@ export function WidgetApp() {
     }
 
     void getCurrentWebviewWindow().startDragging();
+    void ensureOverlayOnTop();
   };
 
   return (

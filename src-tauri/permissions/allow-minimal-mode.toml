@@ -5,4 +5,5 @@ commands.allow = [
   "set_minimal_mode",
   "open_settings_window",
   "show_settings_on_startup",
+  "ensure_overlay_on_top",
 ]
